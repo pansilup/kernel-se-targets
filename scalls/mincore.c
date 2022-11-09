@@ -15,9 +15,14 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 
 int main (void)
 {
-    unsigned long ret;
+    unsigned long adr;
     int prot = PROT_READ | PROT_WRITE; //0x3 ##symbolic
     int flags = MAP_PRIVATE | MAP_ANONYMOUS; //0x16
+    
+    unsigned long ret;
+    unsigned char vec[2];
+    unsigned long vec_adr = (unsigned long)&vec;
+    unsigned long len = 1024; // ##symbol
     //printf("prot:%x ,flags: %x\n", prot, flags);
     
     asm volatile (
@@ -38,17 +43,25 @@ int main (void)
 //  unsigned long t0 = rdtsc(); 
     asm volatile("movq $9, %%rax; \n\t"
             "movq $0x0, %%rdi; \n\t"
-            "movq $1024, %%rsi; \n\t"
+            "movq $4096, %%rsi; \n\t"
             "movq %1, %%rdx; \n\t" //PROT_READ | WRITE
             "movq %2, %%r10; \n\t" //MAP_PRIVATE | ANONYMOUS. 
             "movq $-1, %%r8; \n\t" 
             "movq $0, %%r9; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret):"m"(prot),"m"(flags):"%rax","%rdi","%rsi","%rdx","%r10","%r8","%r9");
+            :"=m"(adr):"m"(prot),"m"(flags):"%rax","%rdi","%rsi","%rdx","%r10","%r8","%r9");
   //unsigned long t1 = rdtsc();
     
-    printf ("ret of mmap: %lx %lx \n", ret, (unsigned long)((void*)(-1)) );
+    asm volatile("movq $27, %%rax; \n\t"
+            "movq %1, %%rdi; \n\t"
+            "movq %2, %%rsi; \n\t"
+            "movq %3, %%rdx; \n\t" //PROT_READ | WRITE
+            "syscall; \n\t"
+            "movq %%rax, %0; \n\t"
+            :"=m"(ret):"m"(adr),"m"(len),"m"(vec_adr):"%rax","%rdi","%rsi","%rdx","%r10","%r8","%r9");
+    
+    printf ("adr: %lx ret of mincore: %lx \n", adr, ret);
     
     //ret = mmap(NULL, 1024, PROT_READ, MAP_ANONYMOUS, -1, 0);
     //printf ("ret of mmap: %lx %d \n", ret, errno);
