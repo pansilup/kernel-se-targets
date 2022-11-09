@@ -1,9 +1,11 @@
+#define _GNU_SOURCE
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
+#include <sys/mman.h>
 
 static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 {
@@ -15,6 +17,7 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
+    unsigned int access_rights = PKEY_DISABLE_ACCESS; //0x1 ##symbol
     
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
@@ -31,17 +34,16 @@ int main (void)
             "vmcall; \n\t"
             :::"%rax", "%rdi");
 
-    //getpriority
-//    unsigned long t0 = rdtsc();
-    asm volatile("movq $33, %%rax; \n\t"
-            "movq $2, %%rdi; \n\t"
-            "movq $0, %%rsi; \n\t"	    
+//  unsigned long t0 = rdtsc(); 
+    asm volatile("movq $330, %%rax; \n\t"
+            "movq $0x0, %%rdi; \n\t"
+            "movq $0x0, %%rsi; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret)::"%rax","%rdi");
-  //  unsigned long t1 = rdtsc();
-  
-    printf ("ret of dup2: %d \n", ret);
-  //  printf ("ret of getpriority: %d  cy : %lu\n", ret, t1-t0);
+            :"=m"(ret)::"%rax","%rdi","%rsi");
+  //unsigned long t1 = rdtsc();
+    
+    printf ("ret of pkey_alloc: %d. \n", ret);
+    //printf ("ret of setpriority: %d. cy: %lu \n", ret, t1-t0);
     return 1;
 }

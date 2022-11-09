@@ -31,14 +31,22 @@ int main (void)
             "vmcall; \n\t"
             :::"%rax", "%rdi");
 
-//  unsigned long t0 = rdtsc(); 
+ //getpriority
+    asm volatile("movq $140, %%rax; \n\t"
+            "movq $0, %%rdi; \n\t"
+            "movq $0, %%rsi; \n\t"
+            "syscall; \n\t"
+            "movq %%rax, %0; \n\t"
+            :"=m"(ret)::"%rax","%rdi","%rsi");
+    ret = ret - 3;
+	    //  unsigned long t0 = rdtsc(); 
     asm volatile("movq $141, %%rax; \n\t"
             "movq $0, %%rdi; \n\t"
             "movq $0, %%rsi; \n\t"
-            "movq $19, %%rdx; \n\t"
+            "movq %1, %%rdx; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret)::"%rax","%rdi","%rsi","%rdx");
+            :"=m"(ret):"m"(ret):"%rax","%rdi","%rsi","%rdx");
   //unsigned long t1 = rdtsc();
     
     printf ("ret of setpriority: %d. \n", ret);

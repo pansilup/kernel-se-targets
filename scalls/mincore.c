@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/socket.h>
+#include <sys/mman.h>
+#include <errno.h>
 
 static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 {
@@ -14,8 +15,11 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 
 int main (void)
 {
-    int ret;
-
+    unsigned long ret;
+    int prot = PROT_READ | PROT_WRITE; //0x3 ##symbolic
+    int flags = MAP_PRIVATE | MAP_ANONYMOUS; //0x16
+    //printf("prot:%x ,flags: %x\n", prot, flags);
+    
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
             "vmcall; \n\t"
@@ -31,25 +35,23 @@ int main (void)
             "vmcall; \n\t"
             :::"%rax", "%rdi");
 
- //getpriority
-    asm volatile("movq $140, %%rax; \n\t"
-            "movq $0, %%rdi; \n\t"
-            "movq $0, %%rsi; \n\t"
+//  unsigned long t0 = rdtsc(); 
+    asm volatile("movq $9, %%rax; \n\t"
+            "movq $0x0, %%rdi; \n\t"
+            "movq $1024, %%rsi; \n\t"
+            "movq %1, %%rdx; \n\t" //PROT_READ | WRITE
+            "movq %2, %%r10; \n\t" //MAP_PRIVATE | ANONYMOUS. 
+            "movq $-1, %%r8; \n\t" 
+            "movq $0, %%r9; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret)::"%rax","%rdi","%rsi");
-    ret = ret - 3;
-	    //  unsigned long t0 = rdtsc(); 
-    asm volatile("movq $141, %%rax; \n\t"
-            "movq $0, %%rdi; \n\t"
-            "movq $0, %%rsi; \n\t"
-            "movq %1, %%rdx; \n\t"
-            "syscall; \n\t"
-            "movq %%rax, %0; \n\t"
-            :"=m"(ret):"m"(ret):"%rax","%rdi","%rsi","%rdx");
+            :"=m"(ret):"m"(prot),"m"(flags):"%rax","%rdi","%rsi","%rdx","%r10","%r8","%r9");
   //unsigned long t1 = rdtsc();
     
-    printf ("ret of setpriority: %d. \n", ret);
+    printf ("ret of mmap: %lx %lx \n", ret, (unsigned long)((void*)(-1)) );
+    
+    //ret = mmap(NULL, 1024, PROT_READ, MAP_ANONYMOUS, -1, 0);
+    //printf ("ret of mmap: %lx %d \n", ret, errno);
     //printf ("ret of setpriority: %d. cy: %lu \n", ret, t1-t0);
     return 1;
 }

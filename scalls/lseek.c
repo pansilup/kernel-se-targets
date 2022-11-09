@@ -14,10 +14,14 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 
 int main (void)
 {
-    int ret;
-    int fd = open("test.txt", O_WRONLY | O_CREAT, 0644);
-    printf ("file fd: %d\n", fd);
-
+    int 	ret;
+    int 	fd; 
+    char 	file[] = "test.txt";
+    unsigned long fnameadr = (unsigned long)&file;
+    int 	flags = O_WRONLY | O_CREAT; 
+    int 	mode = 0644;
+    int 	whence =  1; //SEEK_CUR 1, SEEK_SET 0, SEEK_END 2 ,##symbol
+ 
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
             "vmcall; \n\t"
@@ -31,18 +35,24 @@ int main (void)
             "movq $2, %%rdi; \n\t"
             "cmp $1, %%rdi; \n\t"
             "vmcall; \n\t"
-            :::"%rax", "%rdi");
+            :::"%rax", "%rdi");  
     
-    //lseek
-    
-    asm volatile("movq $8, %%rax; \n\t"
+    asm volatile("movq $2, %%rax; \n\t" //open
             "movq %1, %%rdi; \n\t"
-            "movq $10, %%rsi; \n\t"
-            "movq $1, %%rdx; \n\t"  //SEEK_CUR 1, SEEK_SET 0, SEEK_END 2
+            "movq %2, %%rsi; \n\t"
+            "movq %3, %%rdx; \n\t" 
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret):"m"(fd):"%rax","%rdi","%rsi", "%rdx");
-    printf ("\nlseek return: %d. \n", ret); 
+            :"=m"(fd):"m"(fnameadr),"m"(flags),"m"(mode):"%rax","%rdi","%rsi", "%rdx");
+    
+    asm volatile("movq $8, %%rax; \n\t" //lseek
+            "movq %1, %%rdi; \n\t"
+            "movq $10, %%rsi; \n\t"
+            "movq $1, %%rdx; \n\t"  
+            "syscall; \n\t"
+            "movq %%rax, %0; \n\t"
+            :"=m"(ret):"m"(fd),"m"(whence):"%rax","%rdi","%rsi", "%rdx");
+    printf ("\nfd %d lseek return: %d. \n", fd, ret); 
     
     return 1;
 }
