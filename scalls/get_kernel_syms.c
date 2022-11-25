@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
+#include <linux/module.h>
 
 static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 {
@@ -15,7 +16,7 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
-    int egid = -1; //no change
+    unsigned long adr = 0x0;
 
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
@@ -33,15 +34,15 @@ int main (void)
             :::"%rax", "%rdi");
 
     //  unsigned long t0 = rdtsc(); 
-    asm volatile("movq $114, %%rax; \n\t"
-            "movq $-1, %%rdi; \n\t"
-            "movq %1, %%rsi; \n\t"
+    asm volatile("movq $177, %%rax; \n\t"
+            "movq %1, %%rdi; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret):"m"(egid):"%rax","%rdi","%rsi");
+            :"=m"(ret):"m"(adr):"%rax","%rdi");
     //unsigned long t1 = rdtsc();
     
-    printf ("ret of setregid: %d. \n", ret);
+    printf ("ret of get_kernel_syms: %d. \n", ret);
     //printf ("ret of setpriority: %d. cy: %lu \n", ret, t1-t0);
+    
     return 1;
 }

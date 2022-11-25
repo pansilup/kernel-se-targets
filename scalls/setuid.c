@@ -15,6 +15,7 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
+    int uid = 2000; //##symbol
 
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
@@ -31,15 +32,16 @@ int main (void)
             "vmcall; \n\t"
             :::"%rax", "%rdi");
 
-//  unsigned long t0 = rdtsc(); 
+    //  unsigned long t0 = rdtsc(); 
     asm volatile("movq $105, %%rax; \n\t"
-            "movq $1100, %%rdi; \n\t"
+            "movq %1, %%rdi; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret)::"%rax","%rdi");
-  //unsigned long t1 = rdtsc();
+            :"=m"(ret):"m"(uid):"%rax","%rdi");
+    //unsigned long t1 = rdtsc();
     
     printf ("ret of setuid: %d. \n", ret);
     //printf ("ret of setpriority: %d. cy: %lu \n", ret, t1-t0);
+    
     return 1;
 }

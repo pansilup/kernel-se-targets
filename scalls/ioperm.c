@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/socket.h>
+#include <sys/io.h>
 
 static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 {
@@ -15,8 +15,10 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
-    int egid = -1; //no change
-
+    unsigned long from = 0x378; //port 
+    unsigned long num  = 32;    //num
+    int           on   = 0;     //turn_on ##symbol
+    
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
             "vmcall; \n\t"
@@ -32,16 +34,17 @@ int main (void)
             "vmcall; \n\t"
             :::"%rax", "%rdi");
 
-    //  unsigned long t0 = rdtsc(); 
-    asm volatile("movq $114, %%rax; \n\t"
-            "movq $-1, %%rdi; \n\t"
-            "movq %1, %%rsi; \n\t"
+	    //  unsigned long t0 = rdtsc(); 
+    asm volatile("movq $173, %%rax; \n\t"
+            "movq $1, %%rdi; \n\t"
+            "movq $2, %%rsi; \n\t"
+            "movq $3, %%rdx; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret):"m"(egid):"%rax","%rdi","%rsi");
-    //unsigned long t1 = rdtsc();
+            :"=m"(ret):"m"(from),"m"(num),"m"(on):"%rax","%rdi","%rsi","%rdx");
+  //unsigned long t1 = rdtsc();
     
-    printf ("ret of setregid: %d. \n", ret);
+    printf ("ret of ioperm: %d. \n", ret);
     //printf ("ret of setpriority: %d. cy: %lu \n", ret, t1-t0);
     return 1;
 }

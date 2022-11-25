@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/socket.h>
+#include <sched.h>
 
 static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 {
@@ -15,7 +15,9 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
-    int egid = -1; //no change
+    int pid = 0; //##symbol
+    struct sched_param param;
+    unsigned long adr = (unsigned long)&param;
 
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
@@ -32,16 +34,16 @@ int main (void)
             "vmcall; \n\t"
             :::"%rax", "%rdi");
 
-    //  unsigned long t0 = rdtsc(); 
-    asm volatile("movq $114, %%rax; \n\t"
-            "movq $-1, %%rdi; \n\t"
-            "movq %1, %%rsi; \n\t"
+    //unsigned long t0 = rdtsc();
+    asm volatile("movq $143, %%rax; \n\t"
+            "movq %1, %%rdi; \n\t"
+            "movq %2, %%rsi; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret):"m"(egid):"%rax","%rdi","%rsi");
+            :"=m"(ret):"m"(pid),"m"(adr):"%rax","%rdi","%rsi");
     //unsigned long t1 = rdtsc();
-    
-    printf ("ret of setregid: %d. \n", ret);
-    //printf ("ret of setpriority: %d. cy: %lu \n", ret, t1-t0);
+  
+    printf ("ret of sched_getparam: %d \n", ret);
+    //printf ("ret of getpriority: %d  cy : %lu\n", ret, t1-t0);
     return 1;
 }
