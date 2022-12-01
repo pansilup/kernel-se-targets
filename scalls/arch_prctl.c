@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/socket.h>
+#include <asm/prctl.h>
+#include <sys/syscall.h>
 
 static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 {
@@ -15,6 +15,9 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
+    int code = 0x1004; //ARCH_GET_GS  ##symbolc
+    unsigned long gs;
+    unsigned long addr = (unsigned long)&gs; //0;
 
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
@@ -32,16 +35,15 @@ int main (void)
             :::"%rax", "%rdi");
 
     //unsigned long t0 = rdtsc();
-    asm volatile("movq $140, %%rax; \n\t"
-            "movq $0, %%rdi; \n\t"
-            "movq $0, %%rsi; \n\t"
+    asm volatile("movq $158, %%rax; \n\t"
+            "movq %1, %%rdi; \n\t"
+            "movq %2, %%rsi; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret)::"%rax","%rdi","%rsi");
+            :"=m"(ret):"m"(code),"m"(addr):"%rax","%rdi","%rsi");
     //unsigned long t1 = rdtsc();
   
-    printf ("ret of getpriority: %d \n", ret);
+    printf ("ret of arch_prctl: %d \n", ret);
     //printf ("ret of getpriority: %d  cy : %lu\n", ret, t1-t0);
-    
     return 1;
 }

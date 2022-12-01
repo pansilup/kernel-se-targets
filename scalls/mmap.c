@@ -48,7 +48,7 @@ int main (void)
             :"=m"(ret):"m"(prot),"m"(flags):"%rax","%rdi","%rsi","%rdx","%r10","%r8","%r9");
   //unsigned long t1 = rdtsc();
     
-    printf ("ret of mmap: %lx %lx \n", ret, (unsigned long)((void*)(-1)) );
+    printf ("ret of mmap: %lx\n", ret);
     
     //ret = mmap(NULL, 1024, PROT_READ, MAP_ANONYMOUS, -1, 0);
     //printf ("ret of mmap: %lx %d \n", ret, errno);

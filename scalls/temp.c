@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/socket.h>
+#include <errno.h>
+#include <sys/resource.h>
 
 static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 {
@@ -15,6 +15,7 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
+
 
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
@@ -30,17 +31,19 @@ int main (void)
             "cmp $1, %%rdi; \n\t"
             "vmcall; \n\t"
             :::"%rax", "%rdi");
-
+    errno = 0;
+    ret = errno;
+    ret = getpriority(0,0);
     //unsigned long t0 = rdtsc();
-    asm volatile("movq $140, %%rax; \n\t"
+/*    asm volatile("movq $140, %%rax; \n\t"
             "movq $0, %%rdi; \n\t"
             "movq $0, %%rsi; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret)::"%rax","%rdi","%rsi");
+            :"=m"(ret)::"%rax","%rdi","%rsi"); */
     //unsigned long t1 = rdtsc();
   
-    printf ("ret of getpriority: %d \n", ret);
+    printf ("ret of getpriority: %d errno %d \n", ret, errno);
     //printf ("ret of getpriority: %d  cy : %lu\n", ret, t1-t0);
     
     return 1;
