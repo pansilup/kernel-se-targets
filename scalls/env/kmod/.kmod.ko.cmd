@@ -1,1 +1,0 @@
-cmd_/home/beverly/smu/targets/scalls/env/kmod/kmod.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /home/beverly/smu/targets/scalls/env/kmod/kmod.ko /home/beverly/smu/targets/scalls/env/kmod/kmod.o /home/beverly/smu/targets/scalls/env/kmod/kmod.mod.o;  true
