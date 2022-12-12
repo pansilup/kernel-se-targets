@@ -16,6 +16,7 @@ int main (void)
 {
     int ret;
     int code = 0x1004; //ARCH_GET_GS  ##symbol
+    unsigned long gs;
     unsigned long addr = (unsigned long)&gs; //0;
 
     //unsigned long t0 = rdtsc();

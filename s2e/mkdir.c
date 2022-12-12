@@ -15,7 +15,7 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
-    char dir[] = "env/dir";
+    char dir[] = "env/dir"; //make sure that this directory already exists, we are testing a scall fail scenario
     unsigned long dir_adr = (unsigned long)&dir;
 
     //unsigned long t0 = rdtsc(); 
