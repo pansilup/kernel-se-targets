@@ -17,6 +17,7 @@ int main (void)
     int ret;
     char buf[128];
     unsigned long buf_adr = (unsigned long)&buf;
+    printf("buf adr : %lx \n", buf_adr);
 
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
@@ -42,7 +43,7 @@ int main (void)
             :"=m"(ret):"m"(buf_adr):"%rax","%rdi","%rsi");
   //unsigned long t1 = rdtsc();
     
-    printf ("ret of setpriority: %d. \n", ret);
+    printf ("ret of getcwd: %d. \n", ret);
     //printf ("\nret of setpriority: %d. cy: %lu \n", ret, t1-t0);
     return 1;
 }

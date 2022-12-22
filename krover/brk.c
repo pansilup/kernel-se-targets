@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/socket.h>
+#include <sys/mman.h>
+#include <errno.h>
+#include <malloc.h>
 
 static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 {
@@ -14,13 +16,17 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 
 int main (void)
 {
-    int ret;
-    int pipefd[2] = {2,1};
-    unsigned long bufadr = (unsigned long)&pipefd;
-    char buf[32] = "abcdefg";
-    unsigned long buf_adr = (unsigned long)&buf;
-    printf("buf_adr : %lx\n", buf_adr);
+    unsigned long ret;
+    unsigned long adr;
 
+    asm volatile("movq $12, %%rax; \n\t"
+            "movq $0, %%rdi; \n\t"
+            "syscall; \n\t"
+            "movq %%rax, %0; \n\t"
+            :"=m"(adr)::"%rax","%rdi");
+    unsigned long new_brk = adr + 4096;
+    printf("prev brk %lx new brk %lx\n", adr, new_brk);    
+    
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
             "vmcall; \n\t"
@@ -35,27 +41,17 @@ int main (void)
             "cmp $1, %%rdi; \n\t"
             "vmcall; \n\t"
             :::"%rax", "%rdi");
-
-    //unsigned long t0 = rdtsc();
-    asm volatile("movq $22, %%rax; \n\t"
+    
+    //unsigned long t0 = rdtsc();    
+    asm volatile("movq $12, %%rax; \n\t"
             "movq %1, %%rdi; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret):"m"(bufadr):"%rax","%rdi");
-   
-    int fd = pipefd[1];
-    asm volatile("movq $1, %%rax; \n\t"
-            "movq %1, %%rdi; \n\t"
-            "movq %2, %%rsi; \n\t"
-            "movq $2, %%rdx; \n\t"
-            "syscall; \n\t"
-            "movq %%rax, %0; \n\t"
-            :"=m"(ret):"m"(fd),"m"(buf_adr):"%rax","%rdi","%rsi","%rdx");
-      
+            :"=m"(ret):"m"(new_brk):"%rax","%rdi");
     //unsigned long t1 = rdtsc();
-
-    printf ("ret of write: %d \n", ret);
-    //printf ("ret of write: %d  cy : %lu\n", ret, t1-t0);
+    
+    printf ("prev brk %lx ret of brk: %lx\n", adr, ret);
+    //printf ("ret of brk: %d. cy: %lu \n", ret, t1-t0);
     
     return 1;
 }

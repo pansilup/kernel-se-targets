@@ -16,7 +16,16 @@ static int kmod_init(void)
             printk("%02x ", *((uint8_t*)(crtAddr+i)));
             i++;
         }
-        printk("\n");*/       
+        printk("\n");*/ 
+
+	 unsigned char ret[10];
+        unsigned long ra = (unsigned long)&ret[0];
+        asm volatile("sidt %0; \n\t"
+                     ::"m"(ra):);
+    
+        printk("sidt val %02x %lx\n", *((unsigned short*)(&ret[0])) , *((unsigned long*)(&ret[2])) );
+
+
         return 0;
 }
 

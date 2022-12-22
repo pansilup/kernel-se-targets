@@ -18,13 +18,12 @@ int main (void)
     int ret, ret1;
     char buf[32];
     unsigned long buf_adr = (unsigned long)&buf;
-    char fname[] = "test.txt";
+    printf("buf_adr: %lx\n", buf_adr);
+    char fname[] = "/proc/cpuinfo";
     unsigned long filename_adr = (unsigned long)&fname;
     //=open("test.txt", O_RDONLY);
     int flags = O_RDONLY;
 
-    ret1 = open("test.txt", O_RDONLY);
-    
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
             "vmcall; \n\t"
@@ -43,14 +42,14 @@ int main (void)
 //  unsigned long t0 = rdtsc(); 
     
     //ret1 = open("test.txt", O_RDONLY);
-/*    asm volatile("movq $2, %%rax; \n\t"
+    asm volatile("movq $2, %%rax; \n\t"
             "movq %1, %%rdi; \n\t"
             "movq %2, %%rsi; \n\t"
             //"movq $10, %%rdx; \n\t" // n.a. since not O_CREAT | O_TMPFILE
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
             :"=m"(ret1):"m"(filename_adr),"m"(flags):"%rax","%rdi","%rsi");
-*/
+
    asm volatile("movq $0, %%rax; \n\t"
             "movq %1, %%rdi; \n\t"
             "movq %2, %%rsi; \n\t"

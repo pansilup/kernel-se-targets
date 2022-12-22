@@ -15,11 +15,7 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
-    int pipefd[2] = {2,1};
-    unsigned long bufadr = (unsigned long)&pipefd;
-    char buf[32] = "abcdefg";
-    unsigned long buf_adr = (unsigned long)&buf;
-    printf("buf_adr : %lx\n", buf_adr);
+    int errcd = 0;
 
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
@@ -28,7 +24,7 @@ int main (void)
 
     sleep(0x5);
 
-    //This is to issue an onsite analysis request
+    // This is to issue an onsite analysis request
     asm volatile("movq $0xcdcdcdcd, %%rax; \n\t"
             "leaq 0x5(%%rip), %%rdi; \n\t"
             "movq $2, %%rdi; \n\t"
@@ -36,26 +32,16 @@ int main (void)
             "vmcall; \n\t"
             :::"%rax", "%rdi");
 
-    //unsigned long t0 = rdtsc();
-    asm volatile("movq $22, %%rax; \n\t"
+    //alarm
+//    unsigned long t0 = rdtsc();
+    asm volatile("movq $60, %%rax; \n\t"
             "movq %1, %%rdi; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret):"m"(bufadr):"%rax","%rdi");
-   
-    int fd = pipefd[1];
-    asm volatile("movq $1, %%rax; \n\t"
-            "movq %1, %%rdi; \n\t"
-            "movq %2, %%rsi; \n\t"
-            "movq $2, %%rdx; \n\t"
-            "syscall; \n\t"
-            "movq %%rax, %0; \n\t"
-            :"=m"(ret):"m"(fd),"m"(buf_adr):"%rax","%rdi","%rsi","%rdx");
-      
-    //unsigned long t1 = rdtsc();
-
-    printf ("ret of write: %d \n", ret);
-    //printf ("ret of write: %d  cy : %lu\n", ret, t1-t0);
-    
+            :"=m"(ret):"m"(errcd):"%rax","%rdi");
+  //  unsigned long t1 = rdtsc();
+  
+    printf ("ret of personality: %d \n", ret);
+  //  printf ("ret of getpriority: %d  cy : %lu\n", ret, t1-t0);
     return 1;
 }

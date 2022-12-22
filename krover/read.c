@@ -18,7 +18,8 @@ int main (void)
     int ret, ret1;
     char buf[32];
     unsigned long buf_adr = (unsigned long)&buf;
-    char fname[] = "test.txt";
+    //printf("buf_adr: %lx\n", buf_adr);
+    char fname[] = "/proc/cpuinfo";
     unsigned long filename_adr = (unsigned long)&fname;
     //=open("test.txt", O_RDONLY);
     int flags = O_RDONLY;
