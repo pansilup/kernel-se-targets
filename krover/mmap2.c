@@ -20,11 +20,13 @@ int main (void)
     int prot = PROT_READ | PROT_WRITE | PROT_EXEC; //0x3
     int flags = 0x1; //0x2 | 0x20; //MAP_PRIVATE | MAP_ANONYMOUS; //PRIV:0x2,ANNO:0x20
 
-    char file_name[] = "old";
+    char file_name[] = "env/old";
     unsigned long name_adr = (unsigned long)&file_name;
     int file_flags = O_RDWR; //O_APPEND; //flags ##symbol
     int mode = S_IRWXO | S_IRUSR | S_IWUSR; //777; //##mode 
-    
+    unsigned long adr_to_mp = 0x0;
+    unsigned long offset = 0;
+
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
             "vmcall; \n\t"
@@ -51,15 +53,15 @@ int main (void)
             :"=m"(fd):"m"(name_adr),"m"(file_flags),"m"(mode):"%rax","%rdi","%rsi");
 
     asm volatile("movq $9, %%rax; \n\t"
-            "movq $0x0, %%rdi; \n\t"
+            "movq %4, %%rdi; \n\t"
             "movq $1024, %%rsi; \n\t"
             "movq %1, %%rdx; \n\t" 
             "movq %2, %%r10; \n\t"  
             "movq %3, %%r8; \n\t" 
-            "movq $0, %%r9; \n\t"
+            "movq %5, %%r9; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret):"m"(prot),"m"(flags),"m"(fd):"%rax","%rdi","%rsi","%rdx","%r10","%r8","%r9");
+            :"=m"(ret):"m"(prot),"m"(flags),"m"(fd),"m"(adr_to_mp),"m"(offset):"%rax","%rdi","%rsi","%rdx","%r10","%r8","%r9");
     //unsigned long t1 = rdtsc();
     
     printf ("ret of open %d mmap: %lx\n", fd, ret);

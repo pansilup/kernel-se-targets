@@ -19,13 +19,15 @@ int main (void)
     unsigned long ret;
     unsigned long adr;
 
-    asm volatile("movq $12, %%rax; \n\t"
+    /*asm volatile("movq $12, %%rax; \n\t"
             "movq $0, %%rdi; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
             :"=m"(adr)::"%rax","%rdi");
     unsigned long new_brk = adr + 4096;
-    printf("prev brk %lx new brk %lx\n", adr, new_brk);    
+    printf("prev brk %lx new brk %lx\n", adr, new_brk);
+    */    
+    unsigned long new_brk = 0x0; //##symbol
     
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
@@ -50,7 +52,8 @@ int main (void)
             :"=m"(ret):"m"(new_brk):"%rax","%rdi");
     //unsigned long t1 = rdtsc();
     
-    printf ("prev brk %lx ret of brk: %lx\n", adr, ret);
+    printf ("ret of brk: %lx\n", ret);
+    //printf ("prev brk %lx ret of brk: %lx\n", adr, ret);
     //printf ("ret of brk: %d. cy: %lu \n", ret, t1-t0);
     
     return 1;

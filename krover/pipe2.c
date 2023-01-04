@@ -18,7 +18,8 @@ int main (void)
     int flags = 2048; 
     int pipefd[2] = {2,1};  //##symbol
     unsigned long bufadr = (unsigned long)&pipefd;
-    
+    printf("bufadr %lx\n", bufadr);
+
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
             "vmcall; \n\t"

@@ -15,11 +15,10 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
-//    char fname[] = "test.txt";
- //   unsigned long filename = (unsigned long *)&fname;
-   // int mode = R_OK;
     int pipefd[2] = {2,1};
     unsigned long bufadr = (unsigned long)&pipefd;
+    printf("bufadr : %lx\n", bufadr);
+
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
             "vmcall; \n\t"

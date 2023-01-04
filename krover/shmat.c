@@ -22,10 +22,8 @@ int main (void)
     unsigned long size = 4096;
     unsigned long flag = IPC_CREAT;
     unsigned long shmadr = 0x0;
-    unsigned long shmflags = SHM_RDONLY;
-printf("%lx\n\n", shmflags);
-return 0;
-
+    unsigned long shmflags = SHM_RDONLY; //0x1000
+    
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
             "vmcall; \n\t"
