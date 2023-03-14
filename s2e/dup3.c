@@ -17,7 +17,7 @@ int main (void)
     int ret;
     int flags = 524288; //##symbol
 
-    //unsigned long t0 = rdtsc();
+    //    unsigned long t0 = rdtsc();
     asm volatile("movq $292, %%rax; \n\t"
             "movq $2, %%rdi; \n\t"
             "movq $5, %%rsi; \n\t"	    
@@ -25,10 +25,9 @@ int main (void)
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
             :"=m"(ret):"m"(flags):"%rax","%rdi","%rdx");
-    //unsigned long t1 = rdtsc();
+    //  unsigned long t1 = rdtsc();
   
-    //printf ("ret of dup3: %d \n", ret);
-    //printf ("ret of getpriority: %d  cy : %lu\n", ret, t1-t0);
-    
+    //printf ("ret of dup2: %d \n", ret);
+    //  printf ("ret of getpriority: %d  cy : %lu\n", ret, t1-t0);
     return 1;
 }

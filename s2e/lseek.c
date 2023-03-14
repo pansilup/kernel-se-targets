@@ -21,7 +21,7 @@ int main (void)
     int 	flags = O_WRONLY | O_CREAT; 
     int 	mode = 0644;
     int 	whence =  1; //##symbol
-  
+ 
     asm volatile("movq $2, %%rax; \n\t" //open
             "movq %1, %%rdi; \n\t"
             "movq %2, %%rsi; \n\t"
@@ -37,7 +37,7 @@ int main (void)
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
             :"=m"(ret):"m"(fd),"m"(whence):"%rax","%rdi","%rsi", "%rdx");
-    //printf ("\nfd %d lseek return: %d. \n", fd, ret); 
+    //printf ("fd %d lseek return: %d. \n", fd, ret); 
     
     return 1;
 }

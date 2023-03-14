@@ -15,10 +15,11 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
-    char fname[] = "old";
+    char fname[] = "old";  //this file name is the symbol, no need to create the file in guest, this is a syscall fail scenario
     unsigned long fname_adr = (unsigned long)&fname;
-
-    //unsigned long t0 = rdtsc(); 
+    //printf("dir_name_adr : %lx\n", dir_adr);
+    
+    //  unsigned long t0 = rdtsc(); 
     asm volatile("movq $87, %%rax; \n\t"
             "movq %1, %%rdi; \n\t"
             "syscall; \n\t"
@@ -27,7 +28,7 @@ int main (void)
     //unsigned long t1 = rdtsc();
     
     //printf ("ret of unlink: %d. \n", ret);
-    //printf ("\nret of unlink: %d. cy: %lu \n", ret, t1-t0);
+    //printf ("\nret of setpriority: %d. cy: %lu \n", ret, t1-t0);
     
     return 1;
 }

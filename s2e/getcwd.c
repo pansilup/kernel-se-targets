@@ -15,17 +15,21 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
-    int pipefd[2] = {2,1};
-    unsigned long bufadr = (unsigned long)&pipefd; //symbol
-    //printf("bufadr : %lx\n", bufadr);
+    char buf[128];
+    unsigned long buf_adr = (unsigned long)&buf;  //###symbol
+    //printf("buf adr : %lx \n", buf_adr);
 
-    asm volatile("movq $22, %%rax; \n\t"
+    //getcwd
+    //  unsigned long t0 = rdtsc(); 
+    asm volatile("movq $79, %%rax; \n\t"
             "movq %1, %%rdi; \n\t"
+            "movq $128, %%rsi; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret):"m"(bufadr):"%rax","%rdi");
-  
-    //printf ("ret of pipe: %d \n", ret);
+            :"=m"(ret):"m"(buf_adr):"%rax","%rdi","%rsi");
+    //unsigned long t1 = rdtsc();
     
+    //printf ("ret of getcwd: %d. \n", ret);
+    //printf ("\nret of setpriority: %d. cy: %lu \n", ret, t1-t0);
     return 1;
 }
