@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
+#include <sys/resource.h>
 
 static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 {
@@ -15,6 +16,10 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
+    struct rlimit lim;
+    lim.rlim_cur = 0;
+    lim.rlim_max = 0;    //#symbol
+    unsigned long adr = (unsigned long)&lim;
     
     asm volatile (
             "movq $0xabababababababab, %%rax; \n\t"
@@ -31,18 +36,17 @@ int main (void)
             "vmcall; \n\t"
             :::"%rax", "%rdi");
 
-    //fcntl
+    //setrlimit
 //    unsigned long t0 = rdtsc();
-    asm volatile("movq $72, %%rax; \n\t"
-            "movq $2, %%rdi; \n\t"
-            "movq $0, %%rsi; \n\t" //F_DUPFD	    
-            "movq $5, %%rdx; \n\t"	    
+    asm volatile("movq $160, %%rax; \n\t"
+            "movq $4, %%rdi; \n\t" //RLIMIT_CORE: core file sz
+	    "movq %1, %%rsi; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(ret)::"%rax","%rdi","%rsi","%rdx");
+            :"=m"(ret):"m"(adr):"%rax","%rdi");
   //  unsigned long t1 = rdtsc();
   
-    printf ("ret of fcntl: %d \n", ret);
+    printf ("ret of setrlimit: %d \n", ret);
   //  printf ("ret of getpriority: %d  cy : %lu\n", ret, t1-t0);
     return 1;
 }

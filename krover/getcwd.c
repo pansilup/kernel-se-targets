@@ -37,7 +37,7 @@ int main (void)
 //  unsigned long t0 = rdtsc(); 
     asm volatile("movq $79, %%rax; \n\t"
             "movq %1, %%rdi; \n\t"
-            "movq $128, %%rsi; \n\t"
+            "movq $4, %%rsi; \n\t" //symbol
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
             :"=m"(ret):"m"(buf_adr):"%rax","%rdi","%rsi");

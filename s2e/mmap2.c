@@ -16,28 +16,25 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     unsigned long ret;
-    int fd1 = -1;
-    int fd; //IMPORTANT !!! this is a symbol , however the vlaue will be assigned after the first syscall
-    int prot = PROT_READ | PROT_WRITE | PROT_EXEC; 
-    int flags = 0x1; //0x2 | 0x20; 
+    int fd = -1;
+    int prot = PROT_READ | PROT_WRITE | PROT_EXEC;
+    int flags = 0x1; 
 
-    char file_name[] = "env/old"; //make sure to have this file in guest
+    char file_name[] = "env/old";
     unsigned long name_adr = (unsigned long)&file_name;
     int file_flags = O_RDWR; 
-    int mode = S_IRWXO | S_IRUSR | S_IWUSR; 
-    unsigned long adr_to_mp = 0x0;
+    int mode = S_IRWXO | S_IRUSR | S_IWUSR;  
+    unsigned long adr_to_mp = 0x0; //##symbol
     unsigned long offset = 0;
 
-    //unsigned long t0 = rdtsc(); 
-        asm volatile("movq $2, %%rax; \n\t"
+    asm volatile("movq $2, %%rax; \n\t"
             "movq %1, %%rdi; \n\t"
             "movq $2, %%rsi; \n\t"
             "movq $3, %%rdx; \n\t"
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
-            :"=m"(fd1):"m"(name_adr),"m"(file_flags),"m"(mode):"%rax","%rdi","%rsi");
-    
-    fd = fd1;   //#######symbol
+            :"=m"(fd):"m"(name_adr),"m"(file_flags),"m"(mode):"%rax","%rdi","%rsi");
+
     asm volatile("movq $9, %%rax; \n\t"
             "movq %4, %%rdi; \n\t"
             "movq $1024, %%rsi; \n\t"
@@ -48,9 +45,8 @@ int main (void)
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
             :"=m"(ret):"m"(prot),"m"(flags),"m"(fd),"m"(adr_to_mp),"m"(offset):"%rax","%rdi","%rsi","%rdx","%r10","%r8","%r9");
-    //unsigned long t1 = rdtsc();
     
-    //printf ("ret of open %d mmap: %lx\n", fd, ret);
+    printf ("ret of open %d mmap: %lx\n", fd, ret);
     //printf ("ret of mmap: %d. cy: %lu \n", ret, t1-t0);
     return 1;
 }

@@ -15,8 +15,8 @@ static __attribute__ ((noinline)) unsigned long long rdtsc(void)
 int main (void)
 {
     int ret;
-    int flags = 2048; 
-    int pipefd[2] = {2,1};  //##symbol
+    int flags = 2048; //##symbol
+    int pipefd[2] = {2,1};  
     unsigned long bufadr = (unsigned long)&pipefd;
     printf("bufadr %lx\n", bufadr);
 

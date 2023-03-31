@@ -33,7 +33,7 @@ int main (void)
     //alarm
 //    unsigned long t0 = rdtsc();
     asm volatile("movq $37, %%rax; \n\t"
-            "movq $100, %%rdi; \n\t"
+            "movq $100, %%rdi; \n\t"  //seconds ###stmbol is 100
             "syscall; \n\t"
             "movq %%rax, %0; \n\t"
             :"=m"(ret)::"%rax","%rdi");

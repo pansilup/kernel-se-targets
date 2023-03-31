@@ -22,7 +22,7 @@ int main (void)
 
     char file_name[] = "env/old";
     unsigned long name_adr = (unsigned long)&file_name;
-    int file_flags = O_RDWR; //O_APPEND; //flags ##symbol
+    int file_flags = O_RDWR; //O_APPEND; //flags
     int mode = S_IRWXO | S_IRUSR | S_IWUSR; //777; //##mode 
     unsigned long adr_to_mp = 0x0;
     unsigned long offset = 0;

@@ -16,8 +16,8 @@ int main (void)
 {
     int ret;
     int pipefd[2] = {2,1};
-    unsigned long bufadr = (unsigned long)&pipefd;  //###symbol
-    char buf[32] = "abcdefg";
+    unsigned long bufadr = (unsigned long)&pipefd; 
+    char buf[32] = "ab"; //### buffer content, 2 bytes are symbols
     unsigned long buf_adr = (unsigned long)&buf;
     //printf("buf_adr : %lx\n", buf_adr);
 
@@ -40,7 +40,7 @@ int main (void)
       
     //unsigned long t1 = rdtsc();
 
-    //printf ("ret of write: %d \n", ret);
+    printf ("ret of write: %d \n", ret);
     //printf ("ret of write: %d  cy : %lu\n", ret, t1-t0);
     
     return 1;
